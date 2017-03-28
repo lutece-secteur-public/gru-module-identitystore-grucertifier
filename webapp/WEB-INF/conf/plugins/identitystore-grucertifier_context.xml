@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
+    
+
+    <!-- library notifyGru -->
+    <bean id="identitystore-grucertifier.lib-notifygru.apiManagerTransport" class="fr.paris.lutece.plugins.librarynotifygru.rs.service.NotificationTransportApiManagerRest">
+        <property name="notificationEndPoint">
+            <value>http://localhost:9092/lutece/rest/notification/send</value>
+        </property>
+        <property name="apiManagerEndPoint">
+            <value>http://localhost:9092/lutece/rest/api/token</value>
+        </property>
+    </bean>
+    <bean id="identitystore-grucertifier.lib-notifygru.restTransport" class="fr.paris.lutece.plugins.librarynotifygru.rs.service.NotificationTransportRest">
+        <property name="notificationEndPoint">
+            <value>http://localhost:8080/lutece/rest/grusupply/notification</value>
+        </property>
+    </bean>
+    <bean id="identitystore-grucertifier.lib-notifygru.notificationService" class="fr.paris.lutece.plugins.librarynotifygru.services.NotificationService">
+        <constructor-arg ref="identitystore-grucertifier.lib-notifygru.restTransport"/>
+    </bean> 
+    
+</beans>
