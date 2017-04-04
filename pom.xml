@@ -60,16 +60,16 @@
     </dependencies>
 
     <properties>
-        <componentName>identitystore-fccertifier</componentName>
-        <jiraProjectName>IDSTOREFC</jiraProjectName>
-        <jiraComponentId>13257</jiraComponentId>
+        <componentName>identitystore-grucertifier</componentName>
+        <jiraProjectName>GRUCERT</jiraProjectName>
+        <jiraComponentId>13676</jiraComponentId>
     </properties>
     
     <scm>
-        <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-identitystore-fccertifier.git</connection>
-        <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-module-identitystore-fccertifier.git</developerConnection>
-        <url>https://github.com/lutece-secteur-public/gru-module-identitystore-fccertifier.git</url>
+        <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-identitystore-grucertifier.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-module-identitystore-grucertifier.git</developerConnection>
+        <url>https://github.com/lutece-secteur-public/gru-module-identitystore-grucertifier.git</url>
         <tag>HEAD</tag>
-    </scm>-->
+    </scm>
     
 </project>
