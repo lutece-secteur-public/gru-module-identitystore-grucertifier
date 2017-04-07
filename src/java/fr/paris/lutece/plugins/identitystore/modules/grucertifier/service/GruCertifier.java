@@ -415,7 +415,15 @@ public abstract class GruCertifier extends BaseCertifier
 
         Customer customer = new Customer( );
         customer.setConnectionId( identityDto.getConnectionId( ) );
-        String strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId(), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
+        
+        //we get the user email first in identityDto; then in IdentityStore; to not make
+        //unecesseray call to database
+        String strEmail = identityDto.getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
+        if ( strEmail.isEmpty( ) )
+        {
+            strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId(), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
+        }
+        
         customer.setEmail( strEmail );
         demand.setCustomer( customer );
 
@@ -441,7 +449,7 @@ public abstract class GruCertifier extends BaseCertifier
             broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
 
             broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
-                strEmail
+                customer.getEmail( )
             } ) );
 
             certifNotif.addBroadcastEmail( broadcastEmail );
