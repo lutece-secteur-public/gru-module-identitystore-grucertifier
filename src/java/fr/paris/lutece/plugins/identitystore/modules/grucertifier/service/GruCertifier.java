@@ -432,17 +432,21 @@ public abstract class GruCertifier extends BaseCertifier
         certifNotif.setMyDashboardNotification( notifDashboard );
 
         //set the BroadCast Email
-        BroadcastNotification broadcastEmail = new BroadcastNotification( );
-        broadcastEmail.setMessage( _strMessageGruNotifEmailMessage );
-        broadcastEmail.setSubject( _strMessageGruNotifEmailSubject );
-        broadcastEmail.setSenderEmail( _strMessageGruNotifSenderMail );
-        broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
+        if ( !strEmail.isEmpty( ) )
+        {
+            BroadcastNotification broadcastEmail = new BroadcastNotification( );
+            broadcastEmail.setMessage( _strMessageGruNotifEmailMessage );
+            broadcastEmail.setSubject( _strMessageGruNotifEmailSubject );
+            broadcastEmail.setSenderEmail( _strMessageGruNotifSenderMail );
+            broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
 
-        broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
-            strEmail
-        } ) );
+            broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
+                strEmail
+            } ) );
 
-        certifNotif.addBroadcastEmail( broadcastEmail );
+            certifNotif.addBroadcastEmail( broadcastEmail );
+        }
+        
 
         //set the Backoffice Notif
         BackofficeNotification notifAgent = new BackofficeNotification( );
