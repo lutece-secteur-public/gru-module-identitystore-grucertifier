@@ -477,13 +477,20 @@ public abstract class GruCertifier extends AbstractCertifier
 
         Customer customer = new Customer( );
         customer.setConnectionId( identityDto.getConnectionId( ) );
-        Identity identity = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE );
-        if ( identity != null && MapUtils.isNotEmpty( identity.getAttributes( ) ) && identity.getAttributes( ).containsKey( ATTRIBUTE_EMAIL ) )
+        //we get the user email first in identityDto; then in IdentityStore; to not make
+        //unecesseray call to database
+        String strEmail = identityDto.getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
+        if ( strEmail.isEmpty( ) )
         {
-            String strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL )
-                    .getValue( );
-            customer.setEmail( strEmail );
+            Identity identity = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE );
+            if ( identity != null && MapUtils.isNotEmpty( identity.getAttributes( ) ) && identity.getAttributes( ).containsKey( ATTRIBUTE_EMAIL ) )
+            {
+                strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL )
+                        .getValue( );
+            }
         }
+        customer.setEmail( strEmail );
+        
         demand.setCustomer( customer );
 
         certifNotif.setDemand( demand );
@@ -506,7 +513,6 @@ public abstract class GruCertifier extends AbstractCertifier
             broadcastEmail.setSubject( _strMessageGruNotifEmailSubject );
             broadcastEmail.setSenderEmail( _strMessageGruNotifSenderMail );
             broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
-
             broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
                 customer.getEmail( )
             } ) );
