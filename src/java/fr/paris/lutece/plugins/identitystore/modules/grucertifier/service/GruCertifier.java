@@ -40,26 +40,37 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.BroadcastNotifi
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.MyDashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailAddress;
+import fr.paris.lutece.plugins.identitystore.business.Identity;
+import fr.paris.lutece.plugins.identitystore.business.IdentityAttributeHome;
 import fr.paris.lutece.plugins.identitystore.business.IdentityHome;
-import fr.paris.lutece.plugins.identitystore.service.certifier.BaseCertifier;
+import fr.paris.lutece.plugins.identitystore.service.certifier.AbstractCertifier;
 import fr.paris.lutece.plugins.identitystore.web.rs.dto.IdentityDto;
-import fr.paris.lutece.plugins.librarynotifygru.services.INotificationTransportProvider;
 import fr.paris.lutece.plugins.librarynotifygru.services.NotificationService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
-import java.util.Random;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Gru Certifier Service
  *      extends BaseCertifier for handling of notifications to GRU
  */
-public abstract class GruCertifier extends BaseCertifier
+public abstract class GruCertifier extends AbstractCertifier
 {
-    private static final String GRU_CERTIFIER_APP_CODE = "GruCertifier";
+    /**
+	 * @param strCode
+	 */
+    public GruCertifier( String strCode )
+    {
+	    super( strCode );
+    }
+
+	private static final String GRU_CERTIFIER_APP_CODE = "GruCertifier";
     private static final String ATTRIBUTE_EMAIL = "email";
     
     private String _strDemandPrefix;
@@ -363,31 +374,40 @@ public abstract class GruCertifier extends BaseCertifier
         _notifyGruSenderService = service;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    protected void beforeCertify( IdentityDto identityDto, String strClientAppCode )
+    {
+	    // nothing todo	    
+    }
+    
     /**
-     * Certify the attribute change
-     *
-     * @param identityDto
-     *            The identity data
-     * @param strClientCode
-     *            the client code
+     * {@inheritDoc} 
      */
     @Override
-    public void certify( IdentityDto identityDto, String strClientCode )
+    protected void afterCertify( IdentityDto identityDto, String strClientAppCode, List<String> listCertifiedAttribut )
     {
-        super.certify( identityDto, strClientCode );
-        
-        //Test the existence of a transport provider
-        if ( !SpringContextService.getBeansOfType( INotificationTransportProvider.class ).isEmpty( ) )
-        {
-            Notification certifNotif = buildCertifiedNotif( identityDto, LocaleService.getDefault( ) );
-
-            _notifyGruSenderService.send( certifNotif );
-        }
-        else
-        {
-            // mock mode => certification message is logged
-            AppLogService.info( _strMessageGruNotifDashboardSubject );
-        }
+    	//Test the existence of a transport provider
+    	if( listCertifiedAttribut != null && !listCertifiedAttribut.isEmpty( ) )
+    	{
+	        if ( _notifyGruSenderService != null )
+	        {
+	            Notification certifNotif = buildCertifiedNotif( identityDto, LocaleService.getDefault( ) );
+	
+	            _notifyGruSenderService.send( certifNotif );
+	        }
+	        else
+	        {
+	            // mock mode => certification message is logged
+	            AppLogService.info( _strMessageGruNotifDashboardSubject );
+	        }
+    	}
+    	else
+    	{
+    		AppLogService.info( "No attribut have been certified" );
+    	}
     }
 
     /**
@@ -408,15 +428,19 @@ public abstract class GruCertifier extends BaseCertifier
 
         //set de Demand
         Demand demand = new Demand( );
-        demand.setId( generateDemandId( ) );
+        demand.setId( generateDemandId( identityDto.getConnectionId( ) ) );
         demand.setReference( _strDemandPrefix + demand.getId( ) );
         demand.setStatusId( _nIdCloseDemandStatus );
         demand.setTypeId( _strIdDemandType );
 
         Customer customer = new Customer( );
         customer.setConnectionId( identityDto.getConnectionId( ) );
-        String strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId(), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
-        customer.setEmail( strEmail );
+        Identity identity = IdentityHome.findByConnectionId( identityDto.getConnectionId(), GRU_CERTIFIER_APP_CODE );
+        if( identity!=null && MapUtils.isNotEmpty( identity.getAttributes( ) ) && identity.getAttributes( ).containsKey( ATTRIBUTE_EMAIL ) )
+        {
+        	String strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId(), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
+        	customer.setEmail( strEmail );
+        }
         demand.setCustomer( customer );
 
         certifNotif.setDemand( demand );
@@ -432,17 +456,19 @@ public abstract class GruCertifier extends BaseCertifier
         certifNotif.setMyDashboardNotification( notifDashboard );
 
         //set the BroadCast Email
-        BroadcastNotification broadcastEmail = new BroadcastNotification( );
-        broadcastEmail.setMessage( _strMessageGruNotifEmailMessage );
-        broadcastEmail.setSubject( _strMessageGruNotifEmailSubject );
-        broadcastEmail.setSenderEmail( _strMessageGruNotifSenderMail );
-        broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
-
-        broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
-            strEmail
-        } ) );
-
-        certifNotif.addBroadcastEmail( broadcastEmail );
+        if( StringUtils.isNotEmpty( customer.getEmail( ) ) )
+        {
+	        BroadcastNotification broadcastEmail = new BroadcastNotification( );
+	        broadcastEmail.setMessage( _strMessageGruNotifEmailMessage );
+	        broadcastEmail.setSubject( _strMessageGruNotifEmailSubject );
+	        broadcastEmail.setSenderEmail( _strMessageGruNotifSenderMail );
+	        broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
+	
+	        broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
+	        		customer.getEmail( )
+	        } ) );
+	        certifNotif.addBroadcastEmail( broadcastEmail );
+        }
 
         //set the Backoffice Notif
         BackofficeNotification notifAgent = new BackofficeNotification( );
@@ -458,13 +484,9 @@ public abstract class GruCertifier extends BaseCertifier
      *
      * @return demand id
      */
-    private static String generateDemandId( )
+    private String generateDemandId( String strConnectionId )
     {
-        // FIXME =>how to generate a unique id
-        Random rand = new Random( );
-        int randomNum = rand.nextInt( );
-
-        return String.valueOf( Math.abs( randomNum ) );
+        return String.valueOf( IdentityAttributeHome.getLastIdHistory( strConnectionId, getCode( ) ) );
     }
     
     /**
