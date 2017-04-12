@@ -57,22 +57,21 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Gru Certifier Service
- *      extends BaseCertifier for handling of notifications to GRU
+ * Gru Certifier Service extends BaseCertifier for handling of notifications to GRU
  */
 public abstract class GruCertifier extends AbstractCertifier
 {
     /**
-	 * @param strCode
-	 */
+     * @param strCode
+     */
     public GruCertifier( String strCode )
     {
-	    super( strCode );
+        super( strCode );
     }
 
-	private static final String GRU_CERTIFIER_APP_CODE = "GruCertifier";
+    private static final String GRU_CERTIFIER_APP_CODE = "GruCertifier";
     private static final String ATTRIBUTE_EMAIL = "email";
-    
+
     private String _strDemandPrefix;
     private int _nIdCloseDemandStatus;
     private int _nIdCloseCrmStatus;
@@ -88,280 +87,323 @@ public abstract class GruCertifier extends AbstractCertifier
     private String _strMessageGruNotifSenderName;
     private String _strMessageGruNotifAgentMessage;
     private String _strMessageGruNotifAgentStatusText;
-    
-    private NotificationService _notifyGruSenderService;
-    
 
-         /**
-        * Returns the DemandPrefix
-        * @return The DemandPrefix
-        */ 
-    public String getDemandPrefix()
+    private NotificationService _notifyGruSenderService;
+
+    /**
+     * Returns the DemandPrefix
+     * 
+     * @return The DemandPrefix
+     */
+    public String getDemandPrefix( )
     {
         return _strDemandPrefix;
     }
-    
-       /**
-        * Sets the DemandPrefix
-        * @param strDemandPrefix The DemandPrefix
-        */ 
+
+    /**
+     * Sets the DemandPrefix
+     * 
+     * @param strDemandPrefix
+     *            The DemandPrefix
+     */
     public void setDemandPrefix( String strDemandPrefix )
     {
         _strDemandPrefix = strDemandPrefix;
     }
-    
-       /**
-        * Returns the IdCloseDemandStatus
-        * @return The IdCloseDemandStatus
-        */ 
-    public int getIdCloseDemandStatus()
+
+    /**
+     * Returns the IdCloseDemandStatus
+     * 
+     * @return The IdCloseDemandStatus
+     */
+    public int getIdCloseDemandStatus( )
     {
         return _nIdCloseDemandStatus;
     }
-    
-       /**
-        * Sets the IdCloseDemandStatus
-        * @param nIdCloseDemandStatus The IdCloseDemandStatus
-        */ 
+
+    /**
+     * Sets the IdCloseDemandStatus
+     * 
+     * @param nIdCloseDemandStatus
+     *            The IdCloseDemandStatus
+     */
     public void setIdCloseDemandStatus( int nIdCloseDemandStatus )
     {
         _nIdCloseDemandStatus = nIdCloseDemandStatus;
     }
-    
-       /**
-        * Returns the IdCloseCrmStatus
-        * @return The IdCloseCrmStatus
-        */ 
-    public int getIdCloseCrmStatus()
+
+    /**
+     * Returns the IdCloseCrmStatus
+     * 
+     * @return The IdCloseCrmStatus
+     */
+    public int getIdCloseCrmStatus( )
     {
         return _nIdCloseCrmStatus;
     }
-    
-       /**
-        * Sets the IdCloseCrmStatus
-        * @param nIdCloseCrmStatus The IdCloseCrmStatus
-        */ 
+
+    /**
+     * Sets the IdCloseCrmStatus
+     * 
+     * @param nIdCloseCrmStatus
+     *            The IdCloseCrmStatus
+     */
     public void setIdCloseCrmStatus( int nIdCloseCrmStatus )
     {
         _nIdCloseCrmStatus = nIdCloseCrmStatus;
     }
-    
-        /**
+
+    /**
      * Returns the IdDemandType
+     * 
      * @return The IdDemandType
-     */ 
-    public String getIdDemandType()
+     */
+    public String getIdDemandType( )
     {
         return _strIdDemandType;
     }
 
-        /**
-         * Sets the IdDemandType
-         * @param strIdDemandType The IdDemandType
-         */ 
+    /**
+     * Sets the IdDemandType
+     * 
+     * @param strIdDemandType
+     *            The IdDemandType
+     */
     public void setIdDemandType( String strIdDemandType )
     {
         _strIdDemandType = strIdDemandType;
     }
-    
-       /**
-        * Returns the MessageGruNotifDashboardSubject
-        * @return The MessageGruNotifDashboardSubject
-        */ 
-    public String getMessageGruNotifDashboardSubject()
+
+    /**
+     * Returns the MessageGruNotifDashboardSubject
+     * 
+     * @return The MessageGruNotifDashboardSubject
+     */
+    public String getMessageGruNotifDashboardSubject( )
     {
         return _strMessageGruNotifDashboardSubject;
     }
-    
-       /**
-        * Sets the MessageGruNotifDashboardSubject
-        * @param strMessageGruNotifDashboardSubject The MessageGruNotifDashboardSubject
-        */ 
+
+    /**
+     * Sets the MessageGruNotifDashboardSubject
+     * 
+     * @param strMessageGruNotifDashboardSubject
+     *            The MessageGruNotifDashboardSubject
+     */
     public void setMessageGruNotifDashboardSubject( String strMessageGruNotifDashboardSubject )
     {
         _strMessageGruNotifDashboardSubject = strMessageGruNotifDashboardSubject;
     }
-    
-       /**
-        * Returns the MessageGruNotifDashboardMessage
-        * @return The MessageGruNotifDashboardMessage
-        */ 
-    public String getMessageGruNotifDashboardMessage()
+
+    /**
+     * Returns the MessageGruNotifDashboardMessage
+     * 
+     * @return The MessageGruNotifDashboardMessage
+     */
+    public String getMessageGruNotifDashboardMessage( )
     {
         return _strMessageGruNotifDashboardMessage;
     }
-    
-       /**
-        * Sets the MessageGruNotifDashboardMessage
-        * @param strMessageGruNotifDashboardMessage The MessageGruNotifDashboardMessage
-        */ 
+
+    /**
+     * Sets the MessageGruNotifDashboardMessage
+     * 
+     * @param strMessageGruNotifDashboardMessage
+     *            The MessageGruNotifDashboardMessage
+     */
     public void setMessageGruNotifDashboardMessage( String strMessageGruNotifDashboardMessage )
     {
         _strMessageGruNotifDashboardMessage = strMessageGruNotifDashboardMessage;
     }
-    
-       /**
-        * Returns the MessageGruNotifDashboardStatusText
-        * @return The MessageGruNotifDashboardStatusText
-        */ 
-    public String getMessageGruNotifDashboardStatusText()
+
+    /**
+     * Returns the MessageGruNotifDashboardStatusText
+     * 
+     * @return The MessageGruNotifDashboardStatusText
+     */
+    public String getMessageGruNotifDashboardStatusText( )
     {
         return _strMessageGruNotifDashboardStatusText;
     }
-    
-       /**
-        * Sets the MessageGruNotifDashboardStatusText
-        * @param strMessageGruNotifDashboardStatusText The MessageGruNotifDashboardStatusText
-        */ 
+
+    /**
+     * Sets the MessageGruNotifDashboardStatusText
+     * 
+     * @param strMessageGruNotifDashboardStatusText
+     *            The MessageGruNotifDashboardStatusText
+     */
     public void setMessageGruNotifDashboardStatusText( String strMessageGruNotifDashboardStatusText )
     {
         _strMessageGruNotifDashboardStatusText = strMessageGruNotifDashboardStatusText;
     }
-    
-       /**
-        * Returns the MessageGruNotifDashboardSenderName
-        * @return The MessageGruNotifDashboardSenderName
-        */ 
-    public String getMessageGruNotifDashboardSenderName()
+
+    /**
+     * Returns the MessageGruNotifDashboardSenderName
+     * 
+     * @return The MessageGruNotifDashboardSenderName
+     */
+    public String getMessageGruNotifDashboardSenderName( )
     {
         return _strMessageGruNotifDashboardSenderName;
     }
-    
-       /**
-        * Sets the MessageGruNotifDashboardSenderName
-        * @param strMessageGruNotifDashboardSenderName The MessageGruNotifDashboardSenderName
-        */ 
+
+    /**
+     * Sets the MessageGruNotifDashboardSenderName
+     * 
+     * @param strMessageGruNotifDashboardSenderName
+     *            The MessageGruNotifDashboardSenderName
+     */
     public void setMessageGruNotifDashboardSenderName( String strMessageGruNotifDashboardSenderName )
     {
         _strMessageGruNotifDashboardSenderName = strMessageGruNotifDashboardSenderName;
     }
-    
-       /**
-        * Returns the MessageGruNotifDashboardData
-        * @return The MessageGruNotifDashboardData
-        */ 
-    public String getMessageGruNotifDashboardData()
+
+    /**
+     * Returns the MessageGruNotifDashboardData
+     * 
+     * @return The MessageGruNotifDashboardData
+     */
+    public String getMessageGruNotifDashboardData( )
     {
         return _strMessageGruNotifDashboardData;
     }
-    
-       /**
-        * Sets the MessageGruNotifDashboardData
-        * @param strMessageGruNotifDashboardData The MessageGruNotifDashboardData
-        */ 
+
+    /**
+     * Sets the MessageGruNotifDashboardData
+     * 
+     * @param strMessageGruNotifDashboardData
+     *            The MessageGruNotifDashboardData
+     */
     public void setMessageGruNotifDashboardData( String strMessageGruNotifDashboardData )
     {
         _strMessageGruNotifDashboardData = strMessageGruNotifDashboardData;
     }
-    
-       /**
-        * Returns the MessageGruNotifEmailMessage
-        * @return The MessageGruNotifEmailMessage
-        */ 
-    public String getMessageGruNotifEmailMessage()
+
+    /**
+     * Returns the MessageGruNotifEmailMessage
+     * 
+     * @return The MessageGruNotifEmailMessage
+     */
+    public String getMessageGruNotifEmailMessage( )
     {
         return _strMessageGruNotifEmailMessage;
     }
-    
-       /**
-        * Sets the MessageGruNotifEmailMessage
-        * @param strMessageGruNotifEmailMessage The MessageGruNotifEmailMessage
-        */ 
+
+    /**
+     * Sets the MessageGruNotifEmailMessage
+     * 
+     * @param strMessageGruNotifEmailMessage
+     *            The MessageGruNotifEmailMessage
+     */
     public void setMessageGruNotifEmailMessage( String strMessageGruNotifEmailMessage )
     {
         _strMessageGruNotifEmailMessage = strMessageGruNotifEmailMessage;
     }
-    
-       /**
-        * Returns the MessageGruNotifEmailSubject
-        * @return The MessageGruNotifEmailSubject
-        */ 
-    public String getMessageGruNotifEmailSubject()
+
+    /**
+     * Returns the MessageGruNotifEmailSubject
+     * 
+     * @return The MessageGruNotifEmailSubject
+     */
+    public String getMessageGruNotifEmailSubject( )
     {
         return _strMessageGruNotifEmailSubject;
     }
-    
-       /**
-        * Sets the MessageGruNotifEmailSubject
-        * @param strMessageGruNotifEmailSubject The MessageGruNotifEmailSubject
-        */ 
+
+    /**
+     * Sets the MessageGruNotifEmailSubject
+     * 
+     * @param strMessageGruNotifEmailSubject
+     *            The MessageGruNotifEmailSubject
+     */
     public void setMessageGruNotifEmailSubject( String strMessageGruNotifEmailSubject )
     {
         _strMessageGruNotifEmailSubject = strMessageGruNotifEmailSubject;
     }
-    
-       /**
-        * Returns the MessageGruNotifSenderMail
-        * @return The MessageGruNotifSenderMail
-        */ 
-    public String getMessageGruNotifSenderMail()
+
+    /**
+     * Returns the MessageGruNotifSenderMail
+     * 
+     * @return The MessageGruNotifSenderMail
+     */
+    public String getMessageGruNotifSenderMail( )
     {
         return _strMessageGruNotifSenderMail;
     }
-    
-       /**
-        * Sets the MessageGruNotifSenderMail
-        * @param strMessageGruNotifSenderMail The MessageGruNotifSenderMail
-        */ 
+
+    /**
+     * Sets the MessageGruNotifSenderMail
+     * 
+     * @param strMessageGruNotifSenderMail
+     *            The MessageGruNotifSenderMail
+     */
     public void setMessageGruNotifSenderMail( String strMessageGruNotifSenderMail )
     {
         _strMessageGruNotifSenderMail = strMessageGruNotifSenderMail;
     }
-    
-       /**
-        * Returns the MessageGruNotifSenderName
-        * @return The MessageGruNotifSenderName
-        */ 
-    public String getMessageGruNotifSenderName()
+
+    /**
+     * Returns the MessageGruNotifSenderName
+     * 
+     * @return The MessageGruNotifSenderName
+     */
+    public String getMessageGruNotifSenderName( )
     {
         return _strMessageGruNotifSenderName;
     }
-    
-       /**
-        * Sets the MessageGruNotifSenderName
-        * @param strMessageGruNotifSenderName The MessageGruNotifSenderName
-        */ 
+
+    /**
+     * Sets the MessageGruNotifSenderName
+     * 
+     * @param strMessageGruNotifSenderName
+     *            The MessageGruNotifSenderName
+     */
     public void setMessageGruNotifSenderName( String strMessageGruNotifSenderName )
     {
         _strMessageGruNotifSenderName = strMessageGruNotifSenderName;
     }
-    
-       /**
-        * Returns the MessageGruNotifAgentMessage
-        * @return The MessageGruNotifAgentMessage
-        */ 
-    public String getMessageGruNotifAgentMessage()
+
+    /**
+     * Returns the MessageGruNotifAgentMessage
+     * 
+     * @return The MessageGruNotifAgentMessage
+     */
+    public String getMessageGruNotifAgentMessage( )
     {
         return _strMessageGruNotifAgentMessage;
     }
-    
-       /**
-        * Sets the MessageGruNotifAgentMessage
-        * @param strMessageGruNotifAgentMessage The MessageGruNotifAgentMessage
-        */ 
+
+    /**
+     * Sets the MessageGruNotifAgentMessage
+     * 
+     * @param strMessageGruNotifAgentMessage
+     *            The MessageGruNotifAgentMessage
+     */
     public void setMessageGruNotifAgentMessage( String strMessageGruNotifAgentMessage )
     {
         _strMessageGruNotifAgentMessage = strMessageGruNotifAgentMessage;
     }
-    
-       /**
-        * Returns the MessageGruNotifAgentStatusText
-        * @return The MessageGruNotifAgentStatusText
-        */ 
-    public String getMessageGruNotifAgentStatusText()
+
+    /**
+     * Returns the MessageGruNotifAgentStatusText
+     * 
+     * @return The MessageGruNotifAgentStatusText
+     */
+    public String getMessageGruNotifAgentStatusText( )
     {
         return _strMessageGruNotifAgentStatusText;
     }
-    
-       /**
-        * Sets the MessageGruNotifAgentStatusText
-        * @param strMessageGruNotifAgentStatusText The MessageGruNotifAgentStatusText
-        */ 
+
+    /**
+     * Sets the MessageGruNotifAgentStatusText
+     * 
+     * @param strMessageGruNotifAgentStatusText
+     *            The MessageGruNotifAgentStatusText
+     */
     public void setMessageGruNotifAgentStatusText( String strMessageGruNotifAgentStatusText )
     {
         _strMessageGruNotifAgentStatusText = strMessageGruNotifAgentStatusText;
     }
-    
 
     /**
      * Setter for Spring Context
@@ -374,40 +416,40 @@ public abstract class GruCertifier extends AbstractCertifier
         _notifyGruSenderService = service;
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void beforeCertify( IdentityDto identityDto, String strClientAppCode )
     {
-	    // nothing todo	    
+        // nothing todo
     }
-    
+
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     @Override
     protected void afterCertify( IdentityDto identityDto, String strClientAppCode, List<String> listCertifiedAttribut )
     {
-    	//Test the existence of a transport provider
-    	if( listCertifiedAttribut != null && !listCertifiedAttribut.isEmpty( ) )
-    	{
-	        if ( _notifyGruSenderService != null )
-	        {
-	            Notification certifNotif = buildCertifiedNotif( identityDto, LocaleService.getDefault( ) );
-	
-	            _notifyGruSenderService.send( certifNotif );
-	        }
-	        else
-	        {
-	            // mock mode => certification message is logged
-	            AppLogService.info( _strMessageGruNotifDashboardSubject );
-	        }
-    	}
-    	else
-    	{
-    		AppLogService.info( "No attribut have been certified" );
-    	}
+        // Test the existence of a transport provider
+        if ( listCertifiedAttribut != null && !listCertifiedAttribut.isEmpty( ) )
+        {
+            if ( _notifyGruSenderService != null )
+            {
+                Notification certifNotif = buildCertifiedNotif( identityDto, LocaleService.getDefault( ) );
+
+                _notifyGruSenderService.send( certifNotif );
+            }
+            else
+            {
+                // mock mode => certification message is logged
+                AppLogService.info( _strMessageGruNotifDashboardSubject );
+            }
+        }
+        else
+        {
+            AppLogService.info( "No attribut have been certified" );
+        }
     }
 
     /**
@@ -422,11 +464,11 @@ public abstract class GruCertifier extends AbstractCertifier
     private Notification buildCertifiedNotif( IdentityDto identityDto, Locale locale )
     {
         initNotifyGruConfig( locale );
-        
+
         Notification certifNotif = new Notification( );
         certifNotif.setDate( new Date( ).getTime( ) );
 
-        //set de Demand
+        // set de Demand
         Demand demand = new Demand( );
         demand.setId( generateDemandId( identityDto.getConnectionId( ) ) );
         demand.setReference( _strDemandPrefix + demand.getId( ) );
@@ -435,17 +477,18 @@ public abstract class GruCertifier extends AbstractCertifier
 
         Customer customer = new Customer( );
         customer.setConnectionId( identityDto.getConnectionId( ) );
-        Identity identity = IdentityHome.findByConnectionId( identityDto.getConnectionId(), GRU_CERTIFIER_APP_CODE );
-        if( identity!=null && MapUtils.isNotEmpty( identity.getAttributes( ) ) && identity.getAttributes( ).containsKey( ATTRIBUTE_EMAIL ) )
+        Identity identity = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE );
+        if ( identity != null && MapUtils.isNotEmpty( identity.getAttributes( ) ) && identity.getAttributes( ).containsKey( ATTRIBUTE_EMAIL ) )
         {
-        	String strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId(), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
-        	customer.setEmail( strEmail );
+            String strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL )
+                    .getValue( );
+            customer.setEmail( strEmail );
         }
         demand.setCustomer( customer );
 
         certifNotif.setDemand( demand );
 
-        //set the Dashboard Notif
+        // set the Dashboard Notif
         MyDashboardNotification notifDashboard = new MyDashboardNotification( );
         notifDashboard.setStatusId( _nIdCloseCrmStatus );
         notifDashboard.setSubject( _strMessageGruNotifDashboardSubject );
@@ -455,22 +498,22 @@ public abstract class GruCertifier extends AbstractCertifier
         notifDashboard.setData( _strMessageGruNotifDashboardData );
         certifNotif.setMyDashboardNotification( notifDashboard );
 
-        //set the BroadCast Email
-        if( StringUtils.isNotEmpty( customer.getEmail( ) ) )
+        // set the BroadCast Email
+        if ( StringUtils.isNotEmpty( customer.getEmail( ) ) )
         {
-	        BroadcastNotification broadcastEmail = new BroadcastNotification( );
-	        broadcastEmail.setMessage( _strMessageGruNotifEmailMessage );
-	        broadcastEmail.setSubject( _strMessageGruNotifEmailSubject );
-	        broadcastEmail.setSenderEmail( _strMessageGruNotifSenderMail );
-	        broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
-	
-	        broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
-	        		customer.getEmail( )
-	        } ) );
-	        certifNotif.addBroadcastEmail( broadcastEmail );
+            BroadcastNotification broadcastEmail = new BroadcastNotification( );
+            broadcastEmail.setMessage( _strMessageGruNotifEmailMessage );
+            broadcastEmail.setSubject( _strMessageGruNotifEmailSubject );
+            broadcastEmail.setSenderEmail( _strMessageGruNotifSenderMail );
+            broadcastEmail.setSenderName( _strMessageGruNotifSenderName );
+
+            broadcastEmail.setRecipient( EmailAddress.buildEmailAddresses( new String [ ] {
+                customer.getEmail( )
+            } ) );
+            certifNotif.addBroadcastEmail( broadcastEmail );
         }
 
-        //set the Backoffice Notif
+        // set the Backoffice Notif
         BackofficeNotification notifAgent = new BackofficeNotification( );
         notifAgent.setMessage( _strMessageGruNotifAgentMessage );
         notifAgent.setStatusText( _strMessageGruNotifAgentStatusText );
@@ -488,11 +531,13 @@ public abstract class GruCertifier extends AbstractCertifier
     {
         return String.valueOf( IdentityAttributeHome.getLastIdHistory( strConnectionId, getCode( ) ) );
     }
-    
+
     /**
      * Init the messages for gru Notification
-     * @param locale The locale
+     * 
+     * @param locale
+     *            The locale
      */
     protected abstract void initNotifyGruConfig( Locale locale );
-    
+
 }
