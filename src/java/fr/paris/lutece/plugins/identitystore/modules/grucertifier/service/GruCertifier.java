@@ -45,8 +45,10 @@ import fr.paris.lutece.plugins.identitystore.business.IdentityAttributeHome;
 import fr.paris.lutece.plugins.identitystore.business.IdentityHome;
 import fr.paris.lutece.plugins.identitystore.service.certifier.AbstractCertifier;
 import fr.paris.lutece.plugins.identitystore.web.rs.dto.IdentityDto;
+import fr.paris.lutece.plugins.librarynotifygru.exception.NotifyGruException;
 import fr.paris.lutece.plugins.librarynotifygru.services.NotificationService;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 
 import java.util.Date;
@@ -71,6 +73,7 @@ public abstract class GruCertifier extends AbstractCertifier
 
     private static final String GRU_CERTIFIER_APP_CODE = "GruCertifier";
     private static final String ATTRIBUTE_EMAIL = "email";
+    private static final String PROPERTY_SEND_NOTIFICATION = "identitystore-grucertifier.sendNotification.enable";
 
     private String _strDemandPrefix;
     private int _nIdCloseDemandStatus;
@@ -431,24 +434,33 @@ public abstract class GruCertifier extends AbstractCertifier
     @Override
     protected void afterCertify( IdentityDto identityDto, String strClientAppCode, List<String> listCertifiedAttribut )
     {
-        // Test the existence of a transport provider
-        if ( listCertifiedAttribut != null && !listCertifiedAttribut.isEmpty( ) )
+        if ( AppPropertiesService.getProperty( PROPERTY_SEND_NOTIFICATION ).equals( "true" ) )
         {
-            if ( _notifyGruSenderService != null )
+            // Test the existence of a transport provider
+            if ( listCertifiedAttribut != null && !listCertifiedAttribut.isEmpty( ) )
             {
-                Notification certifNotif = buildCertifiedNotif( identityDto, LocaleService.getDefault( ) );
-
-                _notifyGruSenderService.send( certifNotif );
+                if ( _notifyGruSenderService != null )
+                {
+                    Notification certifNotif = buildCertifiedNotif( identityDto, LocaleService.getDefault( ) );
+                    try
+                    {
+                        _notifyGruSenderService.send( certifNotif );
+                    }
+                    catch ( NotifyGruException e )
+                    {
+                        AppLogService.error( "Unable to send Notification to the dispatcher component (ESB, GruSupply service, or else)",e );
+                    }    
+                }
+                else
+                {
+                    // mock mode => certification message is logged
+                    AppLogService.info( _strMessageGruNotifDashboardSubject );
+                }
             }
             else
             {
-                // mock mode => certification message is logged
-                AppLogService.info( _strMessageGruNotifDashboardSubject );
+                AppLogService.info( "No attribut have been certified" );
             }
-        }
-        else
-        {
-            AppLogService.info( "No attribut have been certified" );
         }
     }
 
