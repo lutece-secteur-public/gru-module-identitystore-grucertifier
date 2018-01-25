@@ -41,10 +41,12 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.MyDashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailAddress;
 import fr.paris.lutece.plugins.identitystore.business.Identity;
+import fr.paris.lutece.plugins.identitystore.business.IdentityAttribute;
 import fr.paris.lutece.plugins.identitystore.business.IdentityAttributeHome;
 import fr.paris.lutece.plugins.identitystore.business.IdentityHome;
+import fr.paris.lutece.plugins.identitystore.service.IdentityChange;
+import fr.paris.lutece.plugins.identitystore.service.IdentityChangeListener;
 import fr.paris.lutece.plugins.identitystore.service.certifier.AbstractCertifier;
-import fr.paris.lutece.plugins.identitystore.web.rs.dto.IdentityDto;
 import fr.paris.lutece.plugins.librarynotifygru.exception.NotifyGruException;
 import fr.paris.lutece.plugins.librarynotifygru.services.NotificationService;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -52,7 +54,6 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.collections.MapUtils;
@@ -61,7 +62,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Gru Certifier Service extends BaseCertifier for handling of notifications to GRU
  */
-public abstract class GruCertifier extends AbstractCertifier
+public abstract class GruCertifier extends AbstractCertifier implements IdentityChangeListener
 {
     /**
      * @param strCode
@@ -420,28 +421,28 @@ public abstract class GruCertifier extends AbstractCertifier
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void beforeCertify( IdentityDto identityDto, String strClientAppCode )
-    {
-        // nothing todo
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void afterCertify( IdentityDto identityDto, String strClientAppCode, List<String> listCertifiedAttribut )
-    {
-        if ( AppPropertiesService.getProperty( PROPERTY_SEND_NOTIFICATION ).equals( "true" ) )
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void processIdentityChange( IdentityChange identityChange )
+	{
+		if ( AppPropertiesService.getProperty( PROPERTY_SEND_NOTIFICATION ).equals( "true" ) && identityChange.getIdentity( ) != null && identityChange.getIdentity( ).getAttributes( ) != null )
         {
+			boolean hasNewCertification = false;
+			for ( IdentityAttribute attribute : identityChange.getIdentity( ).getAttributes( ).values( ) )
+			{
+				if( attribute.getStatus( ) != null && getCode( ).equals( attribute.getStatus( ).getNewCertifier( ) ) )					
+				{
+					hasNewCertification = true;
+					break;
+				}
+			}
             // Test the existence of a transport provider
-            if ( listCertifiedAttribut != null && !listCertifiedAttribut.isEmpty( ) )
+            if ( hasNewCertification )
             {
                 if ( _notifyGruSenderService != null )
                 {
-                    Notification certifNotif = buildCertifiedNotif( identityDto, LocaleService.getDefault( ) );
+                    Notification certifNotif = buildCertifiedNotif( identityChange.getIdentity( ), LocaleService.getDefault( ) );
                     try
                     {
                         _notifyGruSenderService.send( certifNotif );
@@ -459,21 +460,21 @@ public abstract class GruCertifier extends AbstractCertifier
             }
             else
             {
-                AppLogService.info( "No attribut have been certified" );
+                AppLogService.info( "No attribut have been certified by [ " + getCode( ) + " ]" );
             }
-        }
-    }
+        }		
+	}
 
     /**
      * build a notification from validation infos
      *
-     * @param identityDto
-     *            identity data
+     * @param identityData
+     *            identity data from identityChange
      * @param locale
      *            locale
      * @return Notification notification to send (SMS, agent, dashboard, email)
      */
-    private Notification buildCertifiedNotif( IdentityDto identityDto, Locale locale )
+    private Notification buildCertifiedNotif( Identity identityData, Locale locale )
     {
         initNotifyGruConfig( locale );
 
@@ -482,22 +483,26 @@ public abstract class GruCertifier extends AbstractCertifier
 
         // set de Demand
         Demand demand = new Demand( );
-        demand.setId( generateDemandId( identityDto.getConnectionId( ) ) );
+        demand.setId( generateDemandId( identityData.getConnectionId( ) ) );
         demand.setReference( _strDemandPrefix + demand.getId( ) );
         demand.setStatusId( _nIdCloseDemandStatus );
         demand.setTypeId( _strIdDemandType );
 
         Customer customer = new Customer( );
-        customer.setConnectionId( identityDto.getConnectionId( ) );
+        customer.setConnectionId( identityData.getConnectionId( ) );
         //we get the user email first in identityDto; then in IdentityStore; to not make
         //unecesseray call to database
-        String strEmail = identityDto.getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
-        if ( strEmail.isEmpty( ) )
+        String strEmail = StringUtils.EMPTY;
+        if( identityData.getAttributes( ).get( ATTRIBUTE_EMAIL )!=null && StringUtils.isNotEmpty( identityData.getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( ) ) )
         {
-            Identity identity = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE );
+        	strEmail = identityData.getAttributes( ).get( ATTRIBUTE_EMAIL ).getValue( );
+        }
+        else
+        {
+            Identity identity = IdentityHome.findByConnectionId( identityData.getConnectionId( ), GRU_CERTIFIER_APP_CODE );
             if ( identity != null && MapUtils.isNotEmpty( identity.getAttributes( ) ) && identity.getAttributes( ).containsKey( ATTRIBUTE_EMAIL ) )
             {
-                strEmail = IdentityHome.findByConnectionId( identityDto.getConnectionId( ), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL )
+                strEmail = IdentityHome.findByConnectionId( identityData.getConnectionId( ), GRU_CERTIFIER_APP_CODE ).getAttributes( ).get( ATTRIBUTE_EMAIL )
                         .getValue( );
             }
         }
