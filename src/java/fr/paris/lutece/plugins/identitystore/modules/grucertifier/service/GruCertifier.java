@@ -50,7 +50,6 @@ import fr.paris.lutece.plugins.identitystore.service.certifier.AbstractCertifier
 import fr.paris.lutece.plugins.librarynotifygru.exception.NotifyGruException;
 import fr.paris.lutece.plugins.librarynotifygru.services.NotificationService;
 import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 
 import java.util.Date;
@@ -70,11 +69,25 @@ public abstract class GruCertifier extends AbstractCertifier implements Identity
     public GruCertifier( String strCode )
     {
         super( strCode );
+        //Default behaviour : the certifier send notifications
+        _bSendNotification = true;
+    }
+    
+    /**
+     * Constructor with send notification property
+     * @param strCode
+     *          The code
+     * @param bSendNotification
+     *          The send notification boolean
+     */
+    public GruCertifier( String strCode, boolean bSendNotification )
+    {
+        super( strCode );
+        _bSendNotification = bSendNotification;
     }
 
     private static final String GRU_CERTIFIER_APP_CODE = "GruCertifier";
     private static final String ATTRIBUTE_EMAIL = "email";
-    private static final String PROPERTY_SEND_NOTIFICATION = "identitystore-grucertifier.sendNotification.enable";
 
     private String _strDemandPrefix;
     private int _nIdCloseDemandStatus;
@@ -91,6 +104,7 @@ public abstract class GruCertifier extends AbstractCertifier implements Identity
     private String _strMessageGruNotifSenderName;
     private String _strMessageGruNotifAgentMessage;
     private String _strMessageGruNotifAgentStatusText;
+    private boolean _bSendNotification;
 
     private NotificationService _notifyGruSenderService;
 
@@ -426,7 +440,7 @@ public abstract class GruCertifier extends AbstractCertifier implements Identity
 	@Override
 	public void processIdentityChange( IdentityChange identityChange )
 	{
-		if ( AppPropertiesService.getProperty( PROPERTY_SEND_NOTIFICATION ).equals( "true" ) && identityChange.getIdentity( ) != null && identityChange.getIdentity( ).getAttributes( ) != null )
+		if ( _bSendNotification && identityChange.getIdentity( ) != null && identityChange.getIdentity( ).getAttributes( ) != null )
         {
 			boolean hasNewCertification = false;
 			for ( IdentityAttribute attribute : identityChange.getIdentity( ).getAttributes( ).values( ) )
@@ -465,6 +479,25 @@ public abstract class GruCertifier extends AbstractCertifier implements Identity
         }		
 	}
 
+    /**
+     * Check if the certifier needs to send notifs
+     * @return true if the certifier send notifs, false otherwise
+     */
+    public boolean isSendNotification() 
+    {
+        return _bSendNotification;
+    }
+
+    /**
+     * Get the send notification boolean
+     * @param bSendNotification the notification boolean
+     */
+    public void setSendNotification( boolean bSendNotification) 
+    {
+        _bSendNotification = bSendNotification;
+    }
+        
+    
     /**
      * build a notification from validation infos
      *
