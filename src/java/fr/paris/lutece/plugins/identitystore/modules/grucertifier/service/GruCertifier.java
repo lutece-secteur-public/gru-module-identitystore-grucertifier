@@ -56,7 +56,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Gru Certifier Service extends BaseCertifier for handling of notifications to GRU
